@@ -285,14 +285,13 @@ else:
     etiqueta_jugador = "TOP PERFORMER(S):"
 
 # ==============================================================================
-# 7. GENERACIÓN IA 
+# 7. GENERACIÓN IA (MODO EDITORIAL PREMIUM - COPA DEL REY)
 # ==============================================================================
 
 prompt = f"""
-Actúa como Periodista Deportivo experto en la Copa del Rey de Baloncesto (ACB) y Copywriter de Email Marketing viral.
-Estás escribiendo la crónica de la fase: {FASE_ACTUAL}. El torneo es eliminatorio (a vida o muerte).
+Actúa como Redactor Jefe de una newsletter premium y analítica sobre la Copa del Rey de Baloncesto (ACB). Tu objetivo es convertir datos estadísticos avanzados en una crónica narrativa de alto nivel sobre la fase: {FASE_ACTUAL}. El torneo es eliminatorio (a vida o muerte), la tensión es máxima.
 
-DATOS DE LA FASE ({FASE_ACTUAL}):
+DATOS DE LA FASE (Inamovibles):
 {etiqueta_jugador}
 {txt_mejores}
 DESTACADOS:
@@ -302,28 +301,31 @@ EQUIPOS EN ESTA FASE:
 LÍDERES ESTADÍSTICOS DE TODO EL TORNEO HASTA AHORA:
 {txt_trends}
 
-INSTRUCCIONES:
-1. **PRIMERA LÍNEA OBLIGATORIA**: Escribe una frase corta (máx 50 caracteres), impactante y estilo "clickbait" que resuma lo más loco de estos partidos. EMPIEZA LA LÍNEA CON "ASUNTO:".
-2. **RESPETA LOS NOMBRES**: Úsalos tal cual aparecen arriba.
-3. **NARRATIVA**: Crónica vibrante, habla de la tensión del torneo del KO.
+MANUAL DE ESTILO Y TONO (CUMPLIMIENTO ESTRICTO):
+1. PERSPECTIVA Y TRATO: Dirígete al lector de manera individual, exclusivamente en segunda persona del singular ("tú"). Queda terminantemente prohibido el uso de fórmulas de cortesía ("usted") o plurales genéricos ("vosotros", "lectores", "suscriptores"). La redacción debe proyectar una comunicación confidencial y directa (1 a 1).
+2. REGISTRO LINGÜÍSTICO: Emplea un registro coloquial culto. El tono debe ser el de un analista experto que comparte información privilegiada con un socio del mismo nivel técnico. 
+3. RIGOR Y ELEGANCIA: Mantén la máxima profesionalidad periodística. Expresa pasión y dinamismo a través del análisis del juego, descartando por completo cualquier tipo de jerga informal, expresiones adolescentes o vocabulario no profesional.
+4. TÉCNICA NARRATIVA Y ÉPICA: Integra la estadística en una narración fluida y ágil. Evita la enumeración robótica de datos. Utiliza recursos retóricos elegantes (preguntas directas al lector, oraciones cortas para dar ritmo) para maximizar la retención. Transmite la épica y el drama de un torneo donde el que pierde se va a casa.
+5. FORMATO DE ENTREGA: Genera única y exclusivamente el texto final estructurado. Omite saludos automatizados, confirmaciones de instrucciones o cualquier texto fuera de la estructura solicitada.
 
-ESTRUCTURA DE SALIDA (ESTRICTA):
-ASUNTO: [Aquí tu frase clickbait]
+ESTRUCTURA EXACTA DE SALIDA:
+
+ASUNTO: [Una sola frase corta, máx 50 caracteres, impactante y magnética sobre la Copa. Empieza con "ASUNTO:"]
 
 ## 🏆 Especial Copa del Rey 2026: {FASE_ACTUAL}
 
 {titulo_seccion_1}
-[Análisis vibrante de los mejores jugadores de esta fase basándote en los datos aportados]
+[Crónica narrativa de los mejores jugadores, aplicando el manual de estilo. Aporta contexto cualitativo a sus métricas y destaca su impacto vital para la supervivencia de su equipo en el torneo]
 
-### 🚀 Radar de Eficiencia y Contexto
-[Análisis de destacados y rendimiento de equipos (ataque, fluidez, control)]
+### 🚀 Radar de Eficiencia y Pizarra Táctica
+[Análisis combinado de los jugadores destacados y el rendimiento de los equipos (ataque, fluidez, control). Traduce la estadística a conceptos de juego real manteniendo la conexión directa con el lector]
 
 ### 🔥 Dominadores del Torneo (Promedios Acumulados)
 {txt_trends}
 """
 
 try:
-    print(f"🚀 Generando crónica para {FASE_ACTUAL}...")
+    print(f"🚀 Generando crónica premium para {FASE_ACTUAL}...")
     model = genai.GenerativeModel(MODEL_NAME)
     response = model.generate_content(prompt)
     texto = response.text.replace(":\n-", ":\n\n-")
