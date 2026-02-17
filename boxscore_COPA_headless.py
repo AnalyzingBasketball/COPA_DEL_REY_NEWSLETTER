@@ -6,11 +6,11 @@ import os
 import sys
 
 # ==============================================================================
-# 1. CONFIGURACIÓN HEADLESS
+# 1. CONFIGURACIÓN HEADLESS - ESPECIAL COPA DEL REY
 # ==============================================================================
 TEMPORADA = '2025'  # 2025/2026
-COMPETICION = '1'   # Liga Endesa
-NOMBRE_ARCHIVO = f"BoxScore_ACB_{TEMPORADA}_Cumulative.csv"
+COMPETICION = '2'   # 2 = Copa del Rey
+NOMBRE_ARCHIVO = f"BoxScore_Copa_{TEMPORADA}_Cumulative.csv"
 CARPETA_SALIDA = "data"
 
 # API Key pública que usa el frontend de ACB (puede cambiar con el tiempo)
@@ -148,12 +148,8 @@ def get_stats_api(game_id, season_lbl, week_lbl):
         poss_loc = calc_poss(tot_loc, tot_vis); poss_vis = calc_poss(tot_vis, tot_loc)
         game_poss = (poss_loc + poss_vis) / 2
         
-        # --- CORRECCIÓN CRÍTICA AQUI ---
-        # Antes: tm_minutes = max(tot_loc['MIN'], tot_vis['MIN'], 200.0)
-        # Ahora: Quitamos el 200.0 para que use la duración real (aprox 40.0)
         tm_minutes = max(tot_loc['MIN'], tot_vis['MIN'])
         if tm_minutes == 0: tm_minutes = 40.0 # Fallback de seguridad
-        # -------------------------------
 
         p1 = tot_loc['PTS']; p2 = tot_vis['PTS']
         winner_code = "EMPATE"
@@ -203,7 +199,6 @@ def get_stats_api(game_id, season_lbl, week_lbl):
                 
                 team_poss_calc = tm_stats['FGA'] + 0.44 * tm_stats['FTA'] + tm_stats['TOV']
                 
-                # USG% ahora será correcto porque tm_minutes es ~40, no 200
                 usg_pct = safe_div(player_poss_used * tm_minutes, mp * team_poss_calc) * 100 if mp > 0 else 0
                 
                 pppos = safe_div(pts, player_poss_used)
@@ -218,7 +213,6 @@ def get_stats_api(game_id, season_lbl, week_lbl):
                 drb_pct = safe_div(drb * tm_minutes, mp * (tm_stats['DRB'] + opp_stats['ORB'])) * 100
                 trb_pct = safe_div(trb * tm_minutes, mp * (tm_stats['TRB'] + opp_stats['TRB'])) * 100
                 
-                # AST% ahora será correcto
                 ast_den = ((mp / tm_minutes) * tm_stats['FGM']) - fgm
                 ast_pct = safe_div(ast, ast_den) * 100
                 
@@ -266,59 +260,60 @@ def get_stats_api(game_id, season_lbl, week_lbl):
         return []
 
 # ==============================================================================
-# 4. MAIN - BUCLE AUTOMÁTICO
+# 4. MAIN - BUCLE AUTOMÁTICO COPA DEL REY
 # ==============================================================================
 
 def main():
-    print(f"🚀 INICIANDO SCRAPER AUTOMÁTICO: {TEMPORADA} | LIGA ENDESA")
+    print(f"🚀 INICIANDO SCRAPER AUTOMÁTICO: {TEMPORADA} | COPA DEL REY")
     
     all_season_data = []
-    jornada = 1
     
-    # Creamos carpeta si no existe
+    # Mapeo de IDs de jornada en la Copa a nombres legibles
+    fases_copa = {
+        1: "Cuartos de Final",
+        2: "Semifinales",
+        3: "Final"
+    }
+    
     if not os.path.exists(CARPETA_SALIDA):
         os.makedirs(CARPETA_SALIDA)
         print(f"📁 Carpeta creada: {CARPETA_SALIDA}")
 
-    while True:
-        print(f"\n🔍 Analizando Jornada {jornada}...")
+    for jornada_id, nombre_fase in fases_copa.items():
+        print(f"\n🔍 Analizando: {nombre_fase} (Jornada API: {jornada_id})...")
         
         # 1. Obtener IDs de la jornada
-        ids = get_game_ids(TEMPORADA, COMPETICION, str(jornada))
+        ids = get_game_ids(TEMPORADA, COMPETICION, str(jornada_id))
         
-        # 2. Verificar si es el 'futuro' (Lista vacía)
         if not ids:
-            print(f"⛔ Jornada {jornada} vacía o futura. Deteniendo proceso.")
-            break
+            print(f"⛔ {nombre_fase} aún no se ha jugado o no hay datos en la API.")
+            continue
         
-        print(f"✅ Encontrados {len(ids)} partidos. Descargando datos...")
+        print(f"✅ Encontrados {len(ids)} partidos en {nombre_fase}. Descargando datos...")
         
         # 3. Descargar Stats
         jornada_data = []
         for gid in ids:
-            lbl_jornada = f"Jornada {jornada}"
-            stats = get_stats_api(gid, TEMPORADA, lbl_jornada)
+            stats = get_stats_api(gid, TEMPORADA, nombre_fase)
             
             if stats:
                 jornada_data.extend(stats)
             else:
-                print(f"   ⚠️ Partido {gid} sin estadísticas (¿No jugado?).")
+                print(f"   ⚠️ Partido {gid} sin estadísticas completas.")
             
             time.sleep(0.1)
             
         if jornada_data:
             all_season_data.extend(jornada_data)
-            print(f"   ---> Guardados {len(jornada_data)} registros de Jornada {jornada}.")
+            print(f"   ---> Guardados {len(jornada_data)} registros de {nombre_fase}.")
         else:
-            print(f"   ⚠️ Jornada {jornada} con IDs pero sin datos de BoxScore.")
-        
-        jornada += 1
+            print(f"   ⚠️ {nombre_fase} con IDs pero sin datos de BoxScore.")
 
     # ==============================================================================
     # 5. EXPORTACIÓN FINAL
     # ==============================================================================
     if all_season_data:
-        print("\n💾 Generando archivo maestro...")
+        print("\n💾 Generando archivo maestro de la Copa...")
         df = pd.DataFrame(all_season_data)
         
         cols = ['GameID', 'Season', 'Week', 'Team', 'Location', 'Winner', 'Win', 
@@ -340,7 +335,7 @@ def main():
         print(f"🎉 ÉXITO: Archivo guardado en: {ruta_completa}")
         print(f"📊 Total Filas: {len(df)}")
     else:
-        print("❌ No se obtuvieron datos en ninguna jornada.")
+        print("❌ No se obtuvieron datos de la Copa del Rey (aún no ha empezado).")
 
 if __name__ == "__main__":
     main()
