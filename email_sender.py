@@ -7,7 +7,7 @@ import sys
 import pandas as pd
 
 # --- 1. CONFIGURACIÓN ---
-URL_LOGO = "https://raw.githubusercontent.com/AnalyzingBasketball/acb-newsletter-bot/refs/heads/main/logo.png"
+URL_LOGO = "https://raw.githubusercontent.com/AnalyzingBasketball/COPA_DEL_REY_2026_NEWSLETTER/refs/heads/main/logo.png"
 URL_BAJA = "https://analyzingbasketball.wixsite.com/home/baja"
 
 gmail_user = os.environ.get("GMAIL_USER")
