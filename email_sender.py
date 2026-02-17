@@ -5,7 +5,6 @@ import os
 import markdown
 import sys
 import pandas as pd
-import requests
 
 # --- 1. CONFIGURACIÓN ---
 URL_LOGO = "https://raw.githubusercontent.com/AnalyzingBasketball/acb-newsletter-bot/refs/heads/main/logo.png"
@@ -14,13 +13,12 @@ URL_BAJA = "https://analyzingbasketball.wixsite.com/home/baja"
 gmail_user = os.environ.get("GMAIL_USER")
 gmail_password = os.environ.get("GMAIL_PASSWORD")
 url_suscriptores = os.environ.get("URL_SUSCRIPTORES")
-webhook_make = os.environ.get("MAKE_WEBHOOK_URL")
 
 if not gmail_user or not gmail_password:
     print("❌ Error: Faltan credenciales GMAIL_USER o GMAIL_PASSWORD.")
     sys.exit(1)
 
-# --- 2. LEER INFORME (CORREGIDO) ---
+# --- 2. LEER INFORME ---
 ARCHIVO_MD = "newsletter_borrador.md"
 if not os.path.exists(ARCHIVO_MD):
     print(f"❌ Error: No se encuentra {ARCHIVO_MD}")
@@ -32,7 +30,7 @@ with open(ARCHIVO_MD, "r", encoding="utf-8") as f:
 
 # Dividimos en líneas pero manteniendo el formato
 lines = raw_content.split('\n')
-first_line = lines[0].strip() if lines else "Informe ACB"
+first_line = lines[0].strip() if lines else "Informe Copa del Rey"
 
 # LÓGICA DE ASUNTO CLICKBAIT
 if first_line.startswith("ASUNTO:"):
@@ -40,30 +38,16 @@ if first_line.startswith("ASUNTO:"):
     asunto_texto = first_line.replace("ASUNTO:", "").strip()
     asunto_email = f"🏀 {asunto_texto}"
     
-    # 2. El título para LinkedIn será ese mismo asunto
-    titulo_para_linkedin = asunto_texto
-    
-    # 3. Quitamos la primera línea del cuerpo del mensaje para no repetirla
+    # 2. Quitamos la primera línea del cuerpo del mensaje para no repetirla
     # Unimos el resto de líneas recuperando los saltos de línea
     md_content = "\n".join(lines[1:])
 else:
-    # Lógica antigua (por si la IA falla y no pone ASUNTO:)
+    # Lógica de respaldo (por si la IA falla y no pone ASUNTO:)
     md_content = raw_content
     titulo_clean = first_line.replace('#', '').strip()
-    asunto_email = f"🏀 Informe: {titulo_clean}"
-    titulo_para_linkedin = titulo_clean
+    asunto_email = f"🏆 Especial Copa del Rey: {titulo_clean}"
 
-# --- 3. PUBLICAR EN LINKEDIN ---
-if webhook_make:
-    try:
-        # Usamos la variable corregida 'titulo_para_linkedin' para evitar errores
-        texto_linkedin = f"🏀 {titulo_para_linkedin}\n\n📊 Nuevo análisis disponible.\nSuscríbete: https://analyzingbasketball.wixsite.com/home/newsletter\n\n#ACB #Data"
-        requests.post(webhook_make, json={"texto": texto_linkedin})
-        print("✅ LinkedIn: Notificación enviada.")
-    except Exception as e:
-        print(f"⚠️ Error LinkedIn: {e}")
-
-# --- 4. PREPARAR CAMPAÑA ---
+# --- 3. PREPARAR CAMPAÑA ---
 print("📥 Preparando campaña de Email...")
 
 # Convertimos a HTML (Markdown detectará bien las listas ahora)
@@ -90,13 +74,13 @@ plantilla_html_base = f"""
         <div style='background-color: #ffffff; padding: 20px; text-align: center; padding-bottom: 40px;'>
             <a href="https://analyzingbasketball.wixsite.com/home/newsletter" 
                style='display: inline-block; background-color: #000000; color: #ffffff; padding: 14px 30px; text-decoration: none; font-weight: bold; font-size: 14px; letter-spacing: 1px; border-radius: 4px;'>
-               LEER ONLINE
+                HOME
             </a>
         </div>
 
         <div style='background-color: #f9f9f9; padding: 30px; text-align: center; border-top: 1px solid #eeeeee;'>
             <a href='https://analyzingbasketball.wixsite.com/home' style='color: #000000; font-weight: bold; text-decoration: none; font-size: 14px; text-transform: uppercase;'>Analyzing Basketball</a>
-            <p style='color: #999999; font-size: 11px; margin-top: 10px;'>&copy; 2026 AB</p>
+            <p style='color: #999999; font-size: 11px; margin-top: 10px;'>&copy; 2026 Analyzing Basketball | Especial Copa del Rey</p>
             
             <p style='margin-top: 20px;'>
                 <a href="{URL_BAJA}" style='color: #cccccc; font-size: 10px; text-decoration: underline;'>
@@ -110,7 +94,7 @@ plantilla_html_base = f"""
 </html>
 """
 
-# --- 5. GESTIÓN DE SUSCRIPTORES ---
+# --- 4. GESTIÓN DE SUSCRIPTORES ---
 lista_emails = []
 if gmail_user: lista_emails.append(gmail_user)
 
@@ -150,7 +134,7 @@ if url_suscriptores:
     except Exception as e:
         print(f"⚠️ Error crítico leyendo suscriptores: {e}")
 
-# --- 6. ENVÍO MASIVO ---
+# --- 5. ENVÍO MASIVO ---
 print(f"🚀 Iniciando envío a {len(lista_emails)} destinatarios...")
 
 try:
@@ -165,7 +149,7 @@ try:
             msg = MIMEMultipart()
             msg['From'] = f"Analyzing Basketball <{gmail_user}>"
             msg['To'] = email
-            msg['Subject'] = asunto_email # Usamos la variable unificada
+            msg['Subject'] = asunto_email
             msg.attach(MIMEText(plantilla_html_base, 'html'))
             
             server.sendmail(gmail_user, email, msg.as_string())
