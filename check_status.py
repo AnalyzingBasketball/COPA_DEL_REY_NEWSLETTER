@@ -8,13 +8,11 @@ import random
 from bs4 import BeautifulSoup
 
 # ==============================================================================
-# CONFIGURACIÓN
+# CONFIGURACIÓN ESPECIAL COPA DEL REY
 # ==============================================================================
 TEMPORADA = '2025'
-COMPETICION = '1'
-HORAS_BUFFER = 0    # En 0 porque ejecutamos una vez al día
+COMPETICION = '2'   # ID de la Copa del Rey
 LOG_FILE = "data/log.txt"
-BUFFER_FILE = "data/buffer_control.txt"
 
 # API Key y Headers
 API_KEY = '0dd94928-6f57-4c08-a3bd-b1b2f092976e'
@@ -25,27 +23,34 @@ HEADERS_API = {
     'user-agent': 'Mozilla/5.0'
 }
 
+# Definimos las 3 Fases de envío (Sábado, Domingo y Lunes)
+FASES_COPA = [
+    {"paso": 1, "nombre": "Cuartos de Final", "jornada_id": "1", "partidos_terminados_requeridos": 4},
+    {"paso": 2, "nombre": "Semifinales", "jornada_id": "2", "partidos_terminados_requeridos": 2},
+    {"paso": 3, "nombre": "Final", "jornada_id": "3", "partidos_terminados_requeridos": 1}
+]
+
 # ==============================================================================
 # ZONA 1: FUNCIONES DE SCRAPING
 # ==============================================================================
 
-def get_last_jornada_from_log():
+def get_last_fase_from_log():
+    """Lee el log para saber por qué envío de la Copa vamos (0 a 3)"""
     if not os.path.exists(LOG_FILE):
         return 0
-    last_jornada = 0
+    last_paso = 0
     try:
         with open(LOG_FILE, 'r', encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines:
-                match = re.search(r'Jornada\s*[:#-]?\s*(\d+)', line, re.IGNORECASE)
+                match = re.search(r'Paso\s+(\d+)', line, re.IGNORECASE)
                 if match:
                     num = int(match.group(1))
-                    if num > last_jornada:
-                        last_jornada = num
+                    if num > last_paso:
+                        last_paso = num
     except Exception as e:
         print(f"Error leyendo log: {e}")
-        return 0
-    return last_jornada
+    return last_paso
 
 def get_game_ids(temp_id, comp_id, jornada_id):
     url = f"https://www.acb.com/resultados-clasificacion/ver/temporada_id/{temp_id}/competicion_id/{comp_id}/jornada_numero/{jornada_id}"
@@ -76,91 +81,80 @@ def is_game_finished(game_id):
 # ZONA 2: SECUENCIA DE ENVÍO
 # ==============================================================================
 
-def ejecutar_secuencia_completa(jornada):
-    print(f"🔄 Iniciando secuencia completa para Jornada {jornada}...")
+def ejecutar_secuencia_completa(nombre_fase):
+    print(f"🔄 Iniciando secuencia para: {nombre_fase}...")
 
-    # PASO 0: SCRAPER
     NOMBRE_SCRIPT_DATOS = "boxscore_ACB_headless.py"
     print(f"📥 0. Ejecutando {NOMBRE_SCRIPT_DATOS}...")
     try:
         subprocess.run(["python", NOMBRE_SCRIPT_DATOS], check=True, text=True)
-        print("✅ Datos actualizados correctamente.")
     except subprocess.CalledProcessError as e:
-        print(f"❌ Error crítico actualizando datos: {e}")
+        print(f"❌ Error actualizando datos: {e}")
         return False
 
-    # PASO 1: IA
     print("🤖 1. Ejecutando ai_writer.py...")
     try:
-        subprocess.run(["python", "ai_writer.py"], check=True, text=True)
+        # Le pasaremos el nombre de la fase como argumento para que la IA sepa de qué escribir
+        subprocess.run(["python", "ai_writer.py", nombre_fase], check=True, text=True)
     except subprocess.CalledProcessError as e:
-        print(f"❌ Error crítico en ai_writer: {e}")
+        print(f"❌ Error en ai_writer: {e}")
         return False
 
-    # PASO 2: EMAIL
     print("📧 2. Ejecutando email_sender.py...")
     try:
         subprocess.run(["python", "email_sender.py"], check=True, text=True)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Error crítico en email_sender: {e}")
+        print(f"❌ Error en email_sender: {e}")
         return False
 
 # ==============================================================================
-# MAIN (CON FACTOR HUMANO)
+# MAIN 
 # ==============================================================================
 
 def main():
-    last_sent = get_last_jornada_from_log()
-    target_jornada = last_sent + 1
+    pasos_completados = get_last_fase_from_log()
     
-    print(f"--- INICIO SCRIPT DE CONTROL ---")
-    print(f"Revisando Jornada: {target_jornada}")
-
-    game_ids = get_game_ids(TEMPORADA, COMPETICION, str(target_jornada))
-    
-    # 1. BLINDAJE: Si hay menos de 8 partidos, no hacemos nada.
-    if len(game_ids) < 8:
-        print(f"⚠️ Solo veo {len(game_ids)} partidos. Faltan datos en la web. No envío nada.")
+    if pasos_completados >= len(FASES_COPA):
+        print("🏆 La cobertura de la Copa del Rey ha finalizado por completo. No hay más envíos pendientes.")
         return
 
-    # 2. COMPROBACIÓN: ¿Están todos acabados?
-    finished_count = 0
-    for gid in game_ids:
-        if is_game_finished(gid):
-            finished_count += 1
-    
-    print(f"📊 Estado: {finished_count}/{len(game_ids)} terminados.")
+    fase_actual = FASES_COPA[pasos_completados]
+    print(f"--- SCRIPT DE CONTROL: COPA DEL REY ---")
+    print(f"Objetivo actual: Paso {fase_actual['paso']} -> {fase_actual['nombre']}")
 
-    if finished_count == len(game_ids) and len(game_ids) > 0:
-        print("✅ Jornada terminada.")
+    game_ids = get_game_ids(TEMPORADA, COMPETICION, fase_actual['jornada_id'])
+    
+    # COMPROBACIÓN: ¿Cuántos partidos de esta jornada han terminado?
+    finished_count = sum(1 for gid in game_ids if is_game_finished(gid))
+    
+    print(f"📊 Estado: {finished_count} de {fase_actual['partidos_terminados_requeridos']} partidos terminados.")
+
+    if finished_count >= fase_actual['partidos_terminados_requeridos']:
+        print(f"✅ Requisitos cumplidos para {fase_actual['nombre']}.")
         
         # --- EL TRUCO DEL FACTOR HUMANO ---
-        minutos_espera = random.randint(5, 45)
-        print(f"☕ Simulando comportamiento humano... Esperando {minutos_espera} minutos antes de enviar.")
-        print("zzz...")
-        
-        time.sleep(minutos_espera * 60) # Pausa aleatoria
-        
+        minutos_espera = random.randint(5, 20)
+        print(f"☕ Simulando comportamiento humano... Esperando {minutos_espera} minutos.")
+        time.sleep(minutos_espera * 60)
         print("⏰ ¡Despierta! Enviando ahora.")
         # ----------------------------------
 
-        exito = ejecutar_secuencia_completa(target_jornada)
+        exito = ejecutar_secuencia_completa(fase_actual['nombre'])
         
         if exito:
+            # Aseguramos que existe la carpeta data/ antes de escribir el log
+            if not os.path.exists("data"):
+                os.makedirs("data")
+
             fecha_log = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-            linea_log = f"{fecha_log} : ✅ Jornada {target_jornada} completada y enviada.\n"
+            linea_log = f"{fecha_log} : ✅ Paso {fase_actual['paso']} completado y enviado ({fase_actual['nombre']}).\n"
             
             with open(LOG_FILE, "a", encoding="utf-8") as f:
                 f.write(linea_log)
-            
-            # Limpieza por si acaso
-            if os.path.exists(BUFFER_FILE):
-                os.remove(BUFFER_FILE)
             print("🏁 Newsletter enviada con éxito.")
-
     else:
-        print("⚽ Aún se está jugando o faltan datos.")
+        print(f"⚽ Aún faltan partidos por terminar para completar la fase de {fase_actual['nombre']}.")
 
 if __name__ == "__main__":
     main()
