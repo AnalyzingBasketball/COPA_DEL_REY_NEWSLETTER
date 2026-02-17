@@ -310,7 +310,7 @@ INSTRUCCIONES:
 ESTRUCTURA DE SALIDA (ESTRICTA):
 ASUNTO: [Aquí tu frase clickbait]
 
-## 🏆 Especial Copa del Rey: {FASE_ACTUAL}
+## 🏆 Especial Copa del Rey 2026: {FASE_ACTUAL}
 
 {titulo_seccion_1}
 [Análisis vibrante de los mejores jugadores de esta fase basándote en los datos aportados]
