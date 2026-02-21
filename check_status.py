@@ -84,7 +84,7 @@ def is_game_finished(game_id):
 def ejecutar_secuencia_completa(nombre_fase):
     print(f"🔄 Iniciando secuencia para: {nombre_fase}...")
 
-    NOMBRE_SCRIPT_DATOS = "boxscore_ACB_headless.py"
+    NOMBRE_SCRIPT_DATOS = "boxscore_COPA_headless.py"
     print(f"📥 0. Ejecutando {NOMBRE_SCRIPT_DATOS}...")
     try:
         subprocess.run(["python", NOMBRE_SCRIPT_DATOS], check=True, text=True)
