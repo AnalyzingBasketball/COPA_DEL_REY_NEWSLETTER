@@ -289,40 +289,46 @@ else:
 # ==============================================================================
 
 prompt = f"""
-Actúa como Redactor Jefe de una newsletter premium y analítica sobre la Copa del Rey de Baloncesto (ACB). Tu objetivo es convertir datos estadísticos avanzados en una crónica narrativa de alto nivel sobre la fase: {FASE_ACTUAL}. El torneo es eliminatorio (a vida o muerte), la tensión es máxima.
+    Actúa como un analista de baloncesto profesional y periodista deportivo de élite.
+    Vas a escribir la newsletter 'Analyzing Basketball' sobre la Copa del Rey.
+    
+    FASE ACTUAL: {fase_actual}
+    
+    DATOS DE LOS JUGADORES (Top Performers):
+    {top_performers_str}
+    
+    DATOS DE LOS EQUIPOS (Eficiencia):
+    {equipos_stats_str}
+    
+    LÍDERES ACUMULADOS DE LA COPA:
+    {lideres_acumulados_str}
+    
+    REGLAS DE ESTILO (¡MUY ESTRICTAS!):
+    1. TONO: Profesional, analítico, objetivo y periodístico. Eres un experto en datos, no un animador.
+    2. CERO EMOJIS: Está TOTALMENTE PROHIBIDO usar emojis en cualquier parte del texto (ni en los títulos, ni en las listas, ni en el asunto).
+    3. CERO PREGUNTAS RETÓRICAS: No uses frases como "¿Has reparado en...?", "¿Viste cómo...?", "¿Qué me dices de...?". Ve directo al análisis.
+    4. NO HABLES AL LECTOR: Prohibido usar la segunda persona ("sabes", "te demostró", "piensa", "tu"). Usa siempre la tercera persona o formas impersonales ("se observó", "destaca", "es notable").
+    5. CERO DRAMATISMO: Evita clichés exagerados ("clavo en el ataúd", "a vida o muerte", "torrente de sangre"). Usa un lenguaje técnico y elegante.
 
-DATOS DE LA FASE (Inamovibles):
-{etiqueta_jugador}
-{txt_mejores}
-DESTACADOS:
-{txt_rest}
-EQUIPOS EN ESTA FASE:
-{txt_teams}
-LÍDERES ESTADÍSTICOS DE TODO EL TORNEO HASTA AHORA:
-{txt_trends}
+    ESTRUCTURA DE SALIDA (ESTRICTA):
+    ASUNTO: [Escribe aquí un asunto atractivo pero muy profesional y sin emojis, basado en el dato más destacado]
 
-MANUAL DE ESTILO Y TONO (CUMPLIMIENTO ESTRICTO):
-1. PERSPECTIVA Y TRATO: Dirígete al lector de manera individual, exclusivamente en segunda persona del singular ("tú"). Queda terminantemente prohibido el uso de fórmulas de cortesía ("usted") o plurales genéricos ("vosotros", "lectores", "suscriptores"). La redacción debe proyectar una comunicación confidencial y directa (1 a 1).
-2. REGISTRO LINGÜÍSTICO: Emplea un registro coloquial culto. El tono debe ser el de un analista experto que comparte información privilegiada con un socio del mismo nivel técnico. 
-3. RIGOR Y ELEGANCIA: Mantén la máxima profesionalidad periodística. Expresa pasión y dinamismo a través del análisis del juego, descartando por completo cualquier tipo de jerga informal, expresiones adolescentes o vocabulario no profesional.
-4. TÉCNICA NARRATIVA Y ÉPICA: Integra la estadística en una narración fluida y ágil. Evita la enumeración robótica de datos. Utiliza recursos retóricos elegantes (preguntas directas al lector, oraciones cortas para dar ritmo) para maximizar la retención. Transmite la épica y el drama de un torneo donde el que pierde se va a casa.
-5. FORMATO DE ENTREGA: Genera única y exclusivamente el texto final estructurado. Omite saludos automatizados, confirmaciones de instrucciones o cualquier texto fuera de la estructura solicitada.
+    ## Especial Copa del Rey 2026: {fase_actual}
 
-ESTRUCTURA EXACTA DE SALIDA:
+    ### Estrellas de {fase_actual}
+    [Redacta 2 párrafos analizando a los mejores jugadores basándote estrictamente en sus datos de valoración, puntos y True Shooting. Nombra al primero como el jugador más destacado, y luego agrupa al resto destacando su aportación táctica o estadística de forma sobria.]
 
-ASUNTO: [Una sola frase corta, máx 50 caracteres, impactante y magnética sobre la Copa. Empieza con "ASUNTO:"]
+    ### Radar de Eficiencia y Pizarra Táctica
+    [Redacta 2 párrafos analizando el rendimiento de los equipos. Usa los datos de Puntos por 100 posesiones, Asistencias por 100 posesiones o Pérdidas. Analiza qué significa esto a nivel táctico de forma técnica y profesional.]
 
-## 🏆 Especial Copa del Rey 2026: {FASE_ACTUAL}
-
-{titulo_seccion_1}
-[Crónica narrativa de los mejores jugadores, aplicando el manual de estilo. Aporta contexto cualitativo a sus métricas y destaca su impacto vital para la supervivencia de su equipo en el torneo]
-
-### 🚀 Radar de Eficiencia y Pizarra Táctica
-[Análisis combinado de los jugadores destacados y el rendimiento de los equipos (ataque, fluidez, control). Traduce la estadística a conceptos de juego real manteniendo la conexión directa con el lector]
-
-### 🔥 Dominadores del Torneo (Promedios Acumulados)
-{txt_trends}
-"""
+    ### Dominadores del Torneo
+    [Enumera a los 5 jugadores con mayor valoración acumulada en este formato exacto, usando guiones:]
+    - Nombre Apellido (Equipo): XX.X VAL, XX.X PTS, X.X AST
+    - Nombre Apellido (Equipo): XX.X VAL, XX.X PTS, X.X AST
+    - Nombre Apellido (Equipo): XX.X VAL, XX.X PTS, X.X AST
+    - Nombre Apellido (Equipo): XX.X VAL, XX.X PTS, X.X AST
+    - Nombre Apellido (Equipo): XX.X VAL, XX.X PTS, X.X AST
+    """
 
 try:
     print(f"🚀 Generando crónica premium para {FASE_ACTUAL}...")
