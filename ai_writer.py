@@ -198,13 +198,13 @@ prompt = f"""
     
     {instrucciones_especificas}
     
-    REGLAS DE ESTILO (¡MUY ESTRICTAS!):
-    1. TONO Y AUDIENCIA: Profesional, analítico y objetivo. Eres un periodista deportivo experto escribiendo para una audiencia muy entendida en baloncesto en ESPAÑA.
-    2. IDIOMA (ESPAÑOL DE ESPAÑA): Tienes prohibido usar vocabulario latinoamericano. NUNCA uses la palabra "volcada" (usa "mate"), ni "lanzamiento de personal" (usa "tiros libres"), ni "duela" (usa "parqué" o "cancha"). Escribe en castellano peninsular estricto.
-    3. ENTRENADORES Y ALUCINACIONES: Usa los nombres de entrenadores proporcionados en los DATOS DE LOS EQUIPOS para enriquecer el análisis táctico. Salvo la información del MVP y jugadas clave (que DEBES buscar en Google si es la Final), NO inventes datos que no se te proporcionen.
-    4. CERO EMOJIS (CRÍTICO): Está TOTALMENTE PROHIBIDO usar emojis en cualquier parte del texto. NO PUEDES USAR EMOJIS EN EL ASUNTO. NO PUEDES USAR EMOJIS EN LOS TÍTULOS. NO PUEDES USAR EMOJIS EN EL CUERPO DEL TEXTO. Un solo emoji arruinará el formato profesional de la newsletter.
-    5. CERO COLEGUEO O DRAMA: No hables al lector en segunda persona ("sabes", "fíjate"). Usa la tercera persona ("se observa", "destaca"). Evita el dramatismo barato ("a vida o muerte") y las preguntas retóricas.
-    6. VOZ ACTIVA Y RITMO: Escribe siempre en voz activa ("Campazzo lideró...", no "El equipo fue liderado por Campazzo"). Alterna frases largas de análisis con oraciones cortas y contundentes.
+    REGLAS DE ESTILO (¡MUY ESTRICTAS Y DE OBLIGADO CUMPLIMIENTO!):
+    1. TONO Y AUDIENCIA: Profesional, analítico y estrictamente periodístico. Escribes para expertos en baloncesto en ESPAÑA.
+    2. IDIOMA (ESPAÑOL DE ESPAÑA PURO): Tienes TERMINANTEMENTE PROHIBIDO usar vocabulario latinoamericano. Usa "mate" (nunca volcada), "parqué/cancha" (nunca duela), y "tiros libres" (nunca lanzamiento de personal).
+    3. CERO EMOJIS (CRÍTICO): Está TOTALMENTE PROHIBIDO usar emojis en cualquier parte del texto. NI UNO SOLO en el asunto, NI en los títulos, NI en el cuerpo.
+    4. TRATO AL LECTOR (IMPERSONAL): NO te dirijas al lector bajo ningún concepto. Tienes PROHIBIDO usar "tú", PROHIBIDO usar "vosotros" y PROHIBIDO tratar de "usted". Escribe exclusivamente en tercera persona o usando formas impersonales ("se observa", "el equipo logró", "destaca"). Cero preguntas retóricas.
+    5. ENTRENADORES Y ALUCINACIONES: Usa estrictamente los nombres de los entrenadores proporcionados en los datos. No inventes nada.
+    6. RITMO Y VOZ ACTIVA: Cero dramatismos ("a vida o muerte", "clavo en el ataúd"). Escribe en voz activa usando vocabulario técnico real (pick & roll, spacing, mismatch, lado débil, colapso defensivo).
     7. VOCABULARIO DE PARQUÉ: Usa terminología técnica real de baloncesto con naturalidad (spacing, pick & roll, mismatch, IQ, colapso defensivo, tiro tras bote, generación de ventajas, lado débil).
 
     ESTRUCTURA DE SALIDA (ESTRICTA):
