@@ -225,8 +225,8 @@ prompt = f"""
 
 try:
     print(f"🚀 Generando crónica premium para {FASE_ACTUAL}...")
-    # ATENCIÓN AQUÍ: Se añade la herramienta de búsqueda en Google
-    model = genai.GenerativeModel(model_name=MODEL_NAME, tools="google_search_retrieval")
+    # ATENCIÓN AQUÍ: Corrección de la herramienta de Google Search aplicada
+    model = genai.GenerativeModel(model_name=MODEL_NAME, tools="google_search")
     response = model.generate_content(prompt)
     texto = response.text.replace(":\n-", ":\n\n-")
     guardar_salida(texto)
